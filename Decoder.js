@@ -39,7 +39,7 @@ addEventListener("keyup", function (e) {
 
 function setup(rows_columns) {
     
-    var errors = Math.ceil(rows_columns/2);
+    var errors = Math.ceil(rows_columns/2 + 1);
     
     var board = new Array(rows_columns);
     for (var i = 0; i < rows_columns; i++) {
@@ -71,10 +71,10 @@ function setup(rows_columns) {
     }
     board[x][y].value = "end";
     
-    var Offset = Math.round(Math.random()*2 + 2);
-    var player = {x: path[Offset].x, y: path[Offset].y};
+    var Offset = Math.round(Math.random()*2 + 1);
+    var player = {x: path[0].x, y: path[0].y};
     
-    var emojis = [0x1F422,0x1F420,0x1F40C,0x1F32F,0x1F980,0x1F34A,0x1F43C,0x1F413,0x1F427,0x1F419,0x1F41E,0x1F346];
+    var emojis = [0x1F422,0x1F420,0x1F40C,0x1F32F,0x1F980,0x1F34A,0x1F43C,0x1F413,0x1F427,0x1F419,0x1F41E,0x1F346,0x1F423];
     var encoding = shuffle(emojis);
     
     var game = {code: code,board: board,player: player,encoding: encoding, rows_columns: rows_columns, errors: errors, emojis:emojis};
