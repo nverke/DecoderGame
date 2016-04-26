@@ -21,7 +21,7 @@ addEventListener("keyup", function (e) {
                  gameState = update(game,key);
                  render(game);
                  if (gameState == "win") {
-                    alert("Next Level!: Press Enter Again");
+                    alert("Next Level!!");
                     rows_columns++;
                     game = setup(rows_columns);
                     ctx.fillStyle = "#000000";
@@ -154,19 +154,34 @@ function render(game) {
         }
     }
     
+    ctx.fillStyle = "#00FF00";
+    ctx.font = "36px Helvetica";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("N", c.width - 250, 0);
+    ctx.fillText("W", c.width - 290, 30);
+    ctx.fillText("E", c.width - 220, 30);
+    ctx.fillText("S", c.width - 250, 60);
+    
+    ctx.fillStyle = "#00ff00";
+    ctx.fillRect(c.width - 430, 0, 20, 20); //draw start symbol
+    
+    ctx.fillStyle = "#ffff00";
+    ctx.fillRect(c.width - 430, game.code.length*30, 20, 20); //draw end symbol
+    
     for (var i = 1; i < game.code.length; i++) { //draw the coded path.
         ctx.fillStyle = "#ff0f00";
         ctx.font = "24px Helvetica";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
         if (game.code[i] == "west") {
-            ctx.fillText(String.fromCodePoint(game.encoding[0]), c.width - 430, i*30 - 30);
+            ctx.fillText(String.fromCodePoint(game.encoding[0]), c.width - 430, i*30);
         } else if (game.code[i] == "north") {
-            ctx.fillText(String.fromCodePoint(game.encoding[1]), c.width - 430, i*30 - 30);
+            ctx.fillText(String.fromCodePoint(game.encoding[1]), c.width - 430, i*30);
         } else if (game.code[i] == "east") {
-            ctx.fillText(String.fromCodePoint(game.encoding[2]), c.width - 430, i*30 - 30);
+            ctx.fillText(String.fromCodePoint(game.encoding[2]), c.width - 430, i*30);
         } else if (game.code[i] == "south") {
-            ctx.fillText(String.fromCodePoint(game.encoding[3]), c.width - 430, i*30 - 30);
+            ctx.fillText(String.fromCodePoint(game.encoding[3]), c.width - 430, i*30);
         }
     }
     
@@ -216,38 +231,30 @@ function update(game,key) {
     } else {
         if (key == 37) {
             nextMove.x = game.player.x-1;
-            if (validMove(game.board, nextMove, game.rows_columns)) {
+            if (validMove(game, nextMove)) {
                 game.player.x--;
-            } else {
-                game.errors--;
             }
             key = 0;
         }
         else if (key == 38) {
             nextMove.y = game.player.y-1;
-            if (validMove(game.board, nextMove, game.rows_columns)) {
+            if (validMove(game, nextMove)) {
                 game.player.y--;
-            } else {
-                game.errors--;
             }
             key = 0;
         }
         else if (key == 39) {
             nextMove.x = game.player.x+1;
-            if (validMove(game.board, nextMove, game.rows_columns)) {
+            if (validMove(game, nextMove)) {
                 game.player.x++;
                 game.points++;
-            } else {
-                game.errors--;
             }
             key = 0;
         }
         else if (key == 40) {
             nextMove.y = game.player.y+1;
-            if (validMove(game.board, nextMove, game.rows_columns)) {
+            if (validMove(game, nextMove)) {
                 game.player.y++;
-            } else {
-                game.errors--;
             }
             key = 0;
         } else {
@@ -256,15 +263,21 @@ function update(game,key) {
     }
 }
 
-function validMove(board, nextMove, rows_columns) {
-    if (nextMove.x > (rows_columns-1) || nextMove.x < 0 || nextMove.y > (rows_columns-1) || nextMove.y < 0) {
+function validMove(game, nextMove) {
+    if (nextMove.x > (game.rows_columns-1) || nextMove.x < 0 || nextMove.y > (game.rows_columns-1) || nextMove.y < 0) {
         return false;
     }
-    board[nextMove.x][nextMove.y].visibility = true;
-    if (board[nextMove.x][nextMove.y].value != "empty") {
+    
+    if (!game.board[nextMove.x][nextMove.y].visibility) {
+        game.board[nextMove.x][nextMove.y].visibility = true;
+    } else if (game.board[nextMove.x][nextMove.y].value == "empty") {
+        return false;
+    }
+    
+    if (game.board[nextMove.x][nextMove.y].value != "empty") {
         return true;
     } else {
-        //alert("Nothing but trees...");
+        game.errors--;
         return false;
     }
 }
