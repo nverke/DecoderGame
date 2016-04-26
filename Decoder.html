@@ -2,200 +2,33 @@
 <html>
     <body>
         
-        <canvas id="myCanvas" width="640" height="640" style="border:1px solid #d3d3d3;">
+        <canvas id="myCanvas" width="1080" height="640" style="border:1px solid #d3d3d3;">
             Your browser does not support the HTML5 canvas tag.</canvas>
-        
-        <script>
-            var tiles = 64;
-            var rows = Math.sqrt(tiles);
-            var columns = Math.sqrt(tiles);
-            
-            var c = document.getElementById("myCanvas");
-            var ctx = c.getContext("2d");
-            var steps = 0;
-            var game = setup();
-            
-            // Handle keyboard controls
-            var keyDown = {};
-            var keyUp = {};
-            
-            addEventListener("keydown", function (e) {
-                             keyDown[e.keyCode] = true;
-                             }, false);
-                             
-            addEventListener("keyup", function (e) {
-                             if (e.keyCode in keyDown) {
-                                keyUp[e.keyCode] = true;
-                                delete keyDown[e.keyCode];
-                                main();
-                             }
-                             }, false);
-            
-            
-            function main() {
-                update(game.board,game.player);
-                render(game.board,game.player);
-                //requestAnimationFrame(main);
-            }
-            
-            function setup() {
-                
-                var board = new Array(rows);
-                for (var i = 0; i < rows; i++) {
-                    board[i] = new Array(rows);
-                    for (var j = 0; j < rows; j++) {
-                        board[i][j] = {visibility: true, value: "empty"};
-                    }
-                }
-                
-                var code = new Array(tiles/4);
-                var path = new Array(tiles/4);
-                var x = Math.round(Math.random()*(rows-1));
-                var y = Math.round(Math.random()*(rows-1));
-                
-                board[x][y].value = "start";
-                path[0] = {x: x,y: y};
-                
-                for (var len = 0; len < code.length;) {
-                    var rand = Math.random();
-                    
-                    if (rand < .25 && smartMove(x-1,y,path)) {
-                        code[len] = "west";
-                        x--;
-                        len++;
-                    } else if(rand < .5 && smartMove(x,y-1,path)) {
-                        code[len] = "north";
-                        y--;
-                        len++;
-                    } else if(rand < .75 && smartMove(x+1,y,path)) {
-                        code[len] = "east";
-                        x++;
-                        len++;
-                    } else if(rand < 1 && smartMove(x,y+1,path)) {
-                        code[len] = "south";
-                        y++;
-                        len++;
-                    }
-                    board[x][y].value = "path";
-                    path[len] = {x: x,y: y};
-                }
-                board[x][y].value = "end";
-                
-                var Offset = Math.round(Math.random()*4);
-                var player = {x: path[Offset].x, y: path[Offset].y};
-                var game = {code: code,board: board,player: player};
-                return game;
-            }
-        
-            function smartMove(x,y,path) {
-                if (x < 0 || x > (rows-1) || y < 0 || y > (rows-1)) {
-                    return false;
-                }
-                for (var i = 0; i < path.length; i++) {
-                    if (path[i] != null) {
-                        if (x == path[i].x && y == path[i].y) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-        
-            function render(board,player) {
-                
-                board[player.x][player.y].visibility = true;
-                ctx.fillStyle = "#009933";
-                ctx.strokeStyle = "#663300";
-                
-                for (var w = 0; w < c.width; w += c.width/rows) {
-                    for (var l = 0; l < c.height; l += c.height/rows) {
-                        ctx.strokeRect(w, l, c.width/rows, c.height/rows);
-                        ctx.fillRect(w+1, l+1, c.width/rows-1, c.height/rows-1);
-                    }
-                }
-                
-                for (var x = 0; x < rows; x++) {
-                    for (var y = 0; y < rows; y++) {
-                        if (board[x][y].visibility) {
-                            if (board[x][y].value == "path") {
-                                ctx.fillStyle = "#996633";
-                                ctx.fillRect((x*c.width/rows + c.width/((rows-1)*3)), (y*c.height/rows), c.width/(rows*4), c.height/rows);
-                                ctx.fillRect((x*c.width/rows), (y*c.height/rows + c.width/((rows-1)*3)), c.width/rows, c.height/(rows*4));
-                            }
-                            if (board[x][y].value == "end") {
-                                ctx.fillStyle = "#ffcc00";
-                                ctx.fillRect((x*c.width/rows + c.width/(rows*4)), (y*c.height/rows + c.width/(rows*4)), c.width/(rows*2), c.height/(rows*2));
-                            }
-                            if (board[x][y].value == "start") {
-                                ctx.fillStyle = "#00ff00";
-                                ctx.fillRect((x*c.width/rows + c.width/(rows*4)), (y*c.height/rows + c.width/(rows*4)), c.width/(rows*2), c.height/(rows*2));
-                            }
-                            if (board[x][y].value == "empty") {
-                                ctx.fillStyle = "#996677";
-                                ctx.fillRect((x*c.width/rows + c.width/(rows*4)), (y*c.height/rows + c.width/(rows*4)), c.width/(rows*2), c.height/(rows*2));
-                            }
-                        }
-                    }
-                }
-                ctx.fillStyle = "#00fff0";
-                ctx.fillRect((player.x*c.width/rows + c.width/((rows-1)*3)), (player.y*c.height/rows + c.width/((rows-1)*3)), c.width/(rows*4), c.height/(rows*4));
-                
-                ctx.font = "24px Helvetica";
-                ctx.textAlign = "left";
-                ctx.textBaseline = "bottom";
-                ctx.fillText("Steps: " + steps, c.width + c.width/rows, (rows*4));
-            }
-        
-            function update(board,player) {
-                var nextMove = {x: player.x, y: player.y};
-                if (board[player.x][player.y].value == "end") {
-                    alert("You Win!");
-                } else {
-                    if (37 in keyUp) {
-                        nextMove.x = player.x-1;
-                        if (move(board, nextMove)) {
-                            player.x--;
-                        }
-                        delete keyUp[37];
-                    }
-                    else if (38 in keyUp) {
-                        nextMove.y = player.y-1;
-                        if (move(board, nextMove)) {
-                            player.y--;
-                        }
-                        delete keyUp[38];
-                    }
-                    else if (39 in keyUp) {
-                        nextMove.x = player.x+1;
-                        if (move(board, nextMove)) {
-                            player.x++;
-                        }
-                        delete keyUp[39];
-                    }
-                    else if (40 in keyUp) {
-                        nextMove.y = player.y+1;
-                        if (move(board, nextMove)) {
-                            player.y++;
-                        }
-                        delete keyUp[40];
-                    }
-                    steps++;
-                }
-            }
-        
-            function move(board, nextMove) {
-                if (nextMove.x > (rows-1) || nextMove.x < 0 || nextMove.y > (rows-1) || nextMove.y < 0) {
-                    return false;
-                }
-                board[nextMove.x][nextMove.y].visibility = true;
-                if (board[nextMove.x][nextMove.y].value != "empty") {
-                    return true;
-                } else {
-                    alert("Nothing but trees...");
-                    return false;
-                }
-            }
-        main();
-        </script>
+        <p id="code"><p>
+        <script src="Decoder.js"></script>
+        <select style="position: absolute; top: 650px; width: 35px; left: 650px; height: 20px; background-color: white">
+            <option value="north">N</option>
+            <option value="south">S</option>
+            <option value="east">E</option>
+            <option value="west">W</option>
+        </select>
+        <select style="position: absolute; top: 650px; width: 35px; left: 685px; height: 20px; background-color: white">
+            <option value="north">N</option>
+            <option value="south">S</option>
+            <option value="east">E</option>
+            <option value="west">W</option>
+        </select>
+        <select style="position: absolute; top: 650px; width: 35px; left: 720px; height: 20px; background-color: white">
+            <option value="north">N</option>
+            <option value="south">S</option>
+            <option value="east">E</option>
+            <option value="west">W</option>
+        </select>
+        <select style="position: absolute; top: 650px; width: 35px; left: 755px; height: 20px; background-color: white">
+            <option value="north">N</option>
+            <option value="south">S</option>
+            <option value="east">E</option>
+            <option value="west">W</option>
+        </select>
     </body>
 </html>
