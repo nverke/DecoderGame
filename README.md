@@ -13,7 +13,7 @@ RED TILES:
     Uncovering an error tile will result in one less error.
 GREEN TILES:
     Represent the starting tile.
-YELLOW TILES:
+PURPLE TILES:
     Represent the end tile.
     When you move onto a yellow tile you move onto the next level and the dimensions of the map increase.
 
