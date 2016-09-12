@@ -5,7 +5,6 @@ var ctx = c.getContext("2d");
 
 // Handle keyboard controls
 var key = 0;
-var keyPressed = false;
 
 ctx.fillStyle = "#660066";
 ctx.font = "24px Arial";
@@ -72,11 +71,8 @@ function setup(rows_columns) {
     board[x][y].value = "start";
     path[0] = {x: x,y: y};
     
-    //generate an initial random direction
-    var dir = Math.random();
-    
     //create a random path
-    for (var i = 1; i < code.length; i++) {
+    for (i = 1; i < code.length; i++) {
         
         //utilize the smartDirections function to create a smart path.
         var AI = smartDirections(x,y,path,rows_columns);
@@ -146,7 +142,7 @@ function smartDirections(x,y,path,rows_columns) {
         }
         //already on path check
         for (var j = 0; j < path.length; j++) {
-            if (path[j] != null) {
+            if (path[j] !== null) {
                 if (possibleX[i] == path[j].x && possibleY[i] == path[j].y) {
                     delete smartDirections[i];
                 }
@@ -158,18 +154,18 @@ function smartDirections(x,y,path,rows_columns) {
     var validY = [];
     
     //create valid arrays
-    for (var i = 0; i < 4; i++) {
-        if (smartDirections[i] != null) {
+    for (i = 0; i < 4; i++) {
+        if (smartDirections[i] !== null) {
             validDirections.push(smartDirections[i]);
             validX.push(possibleX[i]);
             validY.push(possibleY[i]);
         }
     }
     
-    if (validDirections.length == 0) {
+    if (validDirections.length === 0) {
         validDirections = [];
-        for (var i = 0; i < 4; i++) {
-            if (Directions[i] != null) {
+        for (i = 0; i < 4; i++) {
+            if (Directions[i] !== null) {
                 validDirections.push(Directions[i]);
                 validX.push(possibleX[i]);
                 validY.push(possibleY[i]);
@@ -271,7 +267,7 @@ function update(game,key) {         //updates player lives and position.
     var nextMove = {x: game.player.x, y: game.player.y};
     if (game.board[game.player.x][game.player.y].value == "end") {
         return "win";
-    } else if(game.lives == 0) {
+    } else if(game.lives === 0) {
         return "lose";
     } else {
         if (key == 37) {
